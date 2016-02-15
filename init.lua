@@ -7,6 +7,8 @@ local modules = {
 
     'FSM',
     'Tree',
+    
+    'TreeNN'
 }
 
 for _, file in ipairs( modules ) do
