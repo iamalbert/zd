@@ -24,7 +24,8 @@ install:
 	@echo INST_LUADIR: $(LUADIR)
 	@echo INST_CONFDIR: $(CONFDIR)
 
-	cp *.lua $(LUADIR)
+	mkdir -p $(LUADIR)/zd
+	cp *.lua $(LUADIR)/zd
 
 clean:
 
