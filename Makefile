@@ -5,7 +5,7 @@ LUA_LIBDIR ?= $(TORCH_DIR)/lib
 
 CFLAGS ?=-std=c99 -Wall -pedantic -O2 -I$(LUA_INCDIR)/TH -I$(LUA_INCDIR)
 
-all: build install
+all: build
 
 build:
 	@echo --- build
