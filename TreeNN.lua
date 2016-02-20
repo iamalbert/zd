@@ -96,6 +96,8 @@ function Tree:updateParameters(lr)
     end
 end
 
+Tree.__tostring = nn.Sequential().__tostring
+
 local TreeLinear, parent = torch.class('nn.TreeLinear', 'nn.Sequential')
 function TreeLinear:__init( inputDim )
     parent.__init(self)
@@ -109,3 +111,4 @@ function TreeLinear:__init( inputDim )
     )
     :add( nn.CAddTable() )
 end
+

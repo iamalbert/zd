@@ -2,12 +2,16 @@ zd = {
     version = 0.1
 }
 
+require 'nn'
+
 local modules = {
     'util', 
 
+    'Data',
+    'Evaluator',
+
     'FSM',
     'Tree',
-    
     'TreeNN'
 }
 

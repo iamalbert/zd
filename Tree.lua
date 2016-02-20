@@ -52,6 +52,14 @@ function Tree:getTerminals()
     return self:yield( function(t) return t end)
 end
 
+function Tree:getAllNodes()
+	local ret = {}
+	self:dfs( function(t)
+		table.insert(ret, t )
+	end)
+	return ret
+end
+
 function Tree:getTerminal(n)
     return self:yield( function(t) return t end) [n]
 end
@@ -60,8 +68,10 @@ function Tree:yield( func )
     local ret = {}
     self:dfs(function(self)
         if self:isTerminal() then
-            if func then
+            if type(func) == "function" then
                 table.insert( ret, func(self) )
+			elseif type(func) == "string" then
+				table.insert( ret, self._data[func] )
             else
                 table.insert( ret, self._data )
             end
@@ -109,10 +119,6 @@ function Tree:n_node()
         end
     end)
     return self._cnt
-end
-
-
-function Tree:buttomUpOrder()
 end
 
 function Tree:lowestCommonAncestor(a,b)
@@ -233,13 +239,14 @@ local tt = {
 
 }
 
-function Tree.parsePenn(str)
+function Tree.parsePenn(str, debug)
 	local lexer = zd.FSM.run( trans, zd.FSMConfig(str, "INIT", {
-		-- debug=true
+		debug=debug
 	} ) )
 	local parser = zd.FSM.run( tt, zd.FSMConfig(lexer.stack, "LABEL", {
-		-- debug = true,
+		debug = debug,
 		cur = function( self, t ) return t[1] end
 	}))
 	return parser.root
 end
+
