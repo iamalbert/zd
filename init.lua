@@ -9,6 +9,7 @@ local modules = {
 
     'Data',
     'Evaluator',
+    'Trainer',
 
     'FSM',
     'Tree',
