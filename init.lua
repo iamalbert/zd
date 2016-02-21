@@ -16,5 +16,5 @@ local modules = {
 }
 
 for _, file in ipairs( modules ) do
-    torch.include('zd', file .. '.lua')
+	torch.include('zd', file.. '.lua')
 end

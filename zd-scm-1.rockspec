@@ -1,7 +1,7 @@
 package = "zd"
 version = "scm-1"
 source = {
-   url = "git@github.com:iamalbert/zd.git",
+   url = "https://github.com/iamalbert/zd.git",
    tag = "master"
 }
 description = {
@@ -13,7 +13,8 @@ description = {
    license = "MIT"
 }
 dependencies = {
-   "torch >= 7.0"
+   "torch >= 7.0",
+   "totem"
 }
 build = {
    type = "make",

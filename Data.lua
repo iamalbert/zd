@@ -94,7 +94,11 @@ do
 
         local ret
         if zd.util.isTensor(data) then
-            ret = data:index( 1, cur )
+            if self:batchSize() > 0 then
+                ret = data:index( 1, cur )
+            else
+                ret = data:select( 1, cur[1] )
+            end
         else -- data is table
             if self:batchSize() > 0 then
                 ret = table.index(data, cur)
@@ -107,8 +111,6 @@ do
         state.index = state.index + 1
 
         return ret, oldindex
-
-    end
 
 
 end
