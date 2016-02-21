@@ -61,6 +61,13 @@ function table.count( tbl )
     return cnt
 end
 
+function table.takeone(tbl)
+    for k,v in pairs(tbl) do
+        return k, v
+    end
+    return nil, nil
+end
+
 function table.index( tbl, indices )
     local ret = {}
     for i=1, zd.util.get_size(indices) do

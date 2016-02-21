@@ -3,8 +3,9 @@ do
 
     function Class:__init(config)
         assert( config,  "require a config table"  )
-        assert( config and config.source, "field `source' is required"  )
-        self._data = config.source
+        assert( config and zd.util.isTable(config.source), 
+            "field `source' is required"  )
+        self._source = config.source
         self._config = config
     end
 
@@ -15,10 +16,13 @@ do
         local max = self:rewind()
         assert( zd.util.isNumber(max), "::rewind() must return a number,"
             .. "got `" .. type(max) .. "' instead.")
-
         max = math.floor(max)
         self.state.max = max
         return max
+    end
+
+    function Class:batchSize()
+        return math.floor( tonumber( self._config.batch or 0 ) )
     end
 
     function Class:rewind()
@@ -49,16 +53,23 @@ end
 do 
     local Class, parent = torch.class('zd.Iterator', 'zd.Sampler')
 
-    function Class:batchSize()
-        return math.floor( tonumber( self._config.batch or 0 ) )
-    end
-
     function Class:rewind()
-        local data = self._data
+        local source = self._source
         local config = self._config
         
         local state = self.state
-        state.max = zd.util.get_size( data )
+        state.max = nil 
+
+        for name, db in pairs(source) do
+            if state.max == nil then
+                state.max = zd.util.get_size( db )
+            else
+                if zd.util.get_size(db) ~= state.max then
+                    error("inconsitent length of data sources")
+                end
+            end
+        end
+        assert( state.max, "no data given")
 
         local order
 
@@ -90,26 +101,30 @@ do
     end
 
     function Class:next()
-        local state, data = self.state, self._data
+        local state, source =  self.state, self._source
         local cur = state.order[ state.index ]
 
         if state.index == state.max and state._pad_length ~= nil then
             cur = cur:sub(1, - state._pad_length - 1)
         end
 
-        local ret
-        if zd.util.isTensor(data) then
-            if self:batchSize() > 0 then
-                ret = data:index( 1, cur )
-            else
-                ret = data:select( 1, cur[1] )
+        local ret = {}
+        for name, data in pairs(source) do
+            local datum
+            if zd.util.isTensor(data) then
+                if self:batchSize() > 0 then
+                    datum = data:index( 1, cur )
+                else
+                    datum = data:select( 1, cur[1] )
+                end
+            else -- data is table
+                if self:batchSize() > 0 then
+                    datum = table.index(data, cur)
+                else
+                    datum = data[ cur[1] ]
+                end
             end
-        else -- data is table
-            if self:batchSize() > 0 then
-                ret = table.index(data, cur)
-            else
-                ret = data[ cur[1] ]
-            end
+            ret[name] = datum
         end
         local oldindex = state.index
 
