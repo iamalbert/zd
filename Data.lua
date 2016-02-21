@@ -7,6 +7,14 @@ do
             "field `source' is required"  )
         self._source = config.source
         self._config = config
+        self._cuda = config.cuda
+    end
+    function Class:cuda(opt)
+        if opt == false  then
+            self._cuda = false
+        else
+            self._cuda = true
+        end
     end
 
     function Class:reset()
@@ -25,14 +33,26 @@ do
         return math.floor( tonumber( self._config.batch or 0 ) )
     end
 
+    function Class:next()
+        local ret = self:current()
+
+        local state = self.state
+        local oldindex = state.index
+        state.index = state.index + 1
+
+        if self._cuda then
+            ret = zd.util.recursive_cuda(ret)
+        end
+
+        return ret,oldindex
+    end
+
     function Class:rewind()
         error "not implemented"
     end
-
-    function Class:next()
+    function Class:current()
         error "not implemented"
     end
-
     function Class:finished(state)
         local S = self.state
         if S and (S.index > S.max) then
@@ -100,7 +120,7 @@ do
         return state.max
     end
 
-    function Class:next()
+    function Class:current()
         local state, source =  self.state, self._source
         local cur = state.order[ state.index ]
 
@@ -126,10 +146,6 @@ do
             end
             ret[name] = datum
         end
-        local oldindex = state.index
-
-        state.index = state.index + 1
-
-        return ret, oldindex
+        return ret
     end
 end
