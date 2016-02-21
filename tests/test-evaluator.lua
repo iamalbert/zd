@@ -18,7 +18,7 @@ local model = nn.Linear(inDim, outDim)
 local criterion = nn.AbsCriterion()
 local feedback = optim.ConfusionMatrix(outDim)
 
-function test.Propagate()
+function test.EvaluatorPropagate()
     local called = {}
     for _, event in ipairs(zd.Evaluator._allow_event_list) do
         called[event] = 0
