@@ -10,10 +10,23 @@ Evaluator._allow_event_list = {
 }
 
 function Evaluator:__init(config)
-
     assert( config, torch.type(self) .. " requires a config table" )
-
     assert( config.model, "config requires field `model'" )
+    self:_setup(config)
+end
+
+function Evaluator:run(sampler, criterion)
+    local state = self:_pre_propogate()
+
+    if false ~= self:_trigger("before_epoch", state) then
+        self:_propogate(sampler, state)
+        self:_trigger("after_epoch", state)
+    end
+
+    return state
+end
+
+function Evaluator:_setup(config)
 
     self._config = config
 
@@ -63,16 +76,6 @@ function Evaluator:_trigger( event, ... )
     end
 end
 
-function Evaluator:run(sampler, criterion)
-    local state = self:_pre_propogate()
-
-    if false ~= self:_trigger("before_epoch", state) then
-        self:_propogate(sampler, state)
-        self:_trigger("after_epoch", state)
-    end
-
-    return state
-end
 
 function Evaluator:_pre_propogate()
     self.model:evaluate()

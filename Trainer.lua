@@ -14,7 +14,22 @@ Trainer._allow_event_list = {
 }
 
 function Trainer:__init(config)
+    assert( config, torch.type(self) .. " requires a config table" )
+
+    assert( config.model, "config requires field `model'" )
+    assert( config.criterion, "config requires field `criterion'" )
+    assert( config.optimizer, "config requires field `optimizer'" )
+
     parent.__init(self, config)
+end
+
+function Trainer:_setup(config)
+    parent._setup(self, config)
+
+    self.criterion = config.criterion
+    self.optimizer = config.optimizer
+
+    self.params , self.gradParams = self.model:getParameters()
 end
 
 --[[
@@ -54,7 +69,6 @@ function Trainer:_pre_propogate()
 
     model:zeroGradParameters()
 
-    self.params , self.gradParams = self.model:getParameters()
 
     state.optim_state = table.deepcopy( self._config.optim_state or {} )
     state.optim_config = self._config.optim_config
