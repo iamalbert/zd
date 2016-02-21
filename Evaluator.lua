@@ -118,7 +118,7 @@ function Evaluator:_do_example( example, state )
     end
 end
 
-function Evaluator:_compute_loss( example, model, criterion, state )
+function Evaluator:_compute_loss( example, state )
     if self.criterion ~= nil then
         example.loss = self.criterion:forward(example.output, example.target)
         state.loss = state.loss + example.loss
