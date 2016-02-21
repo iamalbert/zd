@@ -37,6 +37,8 @@ function Evaluator:_setup(config)
 
     self.name     = config.name or torch.type(self)
 
+    self.cuda     = config.cuda
+
     self.model    = config.model
     self.debug    = config.debug
 

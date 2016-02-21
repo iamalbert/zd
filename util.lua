@@ -68,6 +68,7 @@ function table.takeone(tbl)
     return nil, nil
 end
 
+
 function table.index( tbl, indices )
     local ret = {}
     for i=1, zd.util.get_size(indices) do
@@ -142,6 +143,19 @@ local util_impl = {
             return obj:size(1)
         else
             return #obj
+        end
+    end,
+
+    recursive_find_tensor = function(obj, func)
+        if zd.util.isTensor(obj) then
+            return func(obj)
+        elseif zd.util.isTable(obj) then
+            for k,v in pairs(obj) do
+                obj[k] = zd.util.recursive_find_tensor(v, func)
+            end
+            return obj
+        else
+            return obj
         end
     end,
 
