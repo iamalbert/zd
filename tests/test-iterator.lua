@@ -8,7 +8,7 @@ local test = {}
 local tester = totem.Tester()
 
 
-local data = torch.rand( 88, 40, 500 )
+local data = torch.rand( 883, 40, 500 )
 
 function test.no_shuffle()
     local iter = zd.Iterator {

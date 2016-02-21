@@ -1,14 +1,31 @@
 do
     local Class = torch.class('zd.Sampler')
 
-    function Class:__init()
+    function Class:__init(config)
+        assert( config,  "require a config table"  )
+        assert( config and config.source, "field `source' is required"  )
+        self._data = config.source
+        self._config = config
     end
 
     function Class:reset()
+        self.state = {
+            index = 1,
+        }
+        local max = self:rewind()
+        assert( zd.util.isNumber(max), "::rewind() must return a number,"
+            .. "got `" .. type(max) .. "' instead.")
+
+        max = math.floor(max)
+        self.state.max = max
+        return max
+    end
+
+    function Class:rewind()
         error "not implemented"
     end
 
-    function Class:next(state)
+    function Class:next()
         error "not implemented"
     end
 
@@ -29,29 +46,19 @@ do
     end
 end
 
-
 do 
     local Class, parent = torch.class('zd.Iterator', 'zd.Sampler')
-
-    function Class:__init(config)
-        assert( config,  "require a config table"  )
-        assert( config and config.source, "field `source' is required"  )
-        self._data = config.source
-        self._config = config
-    end
 
     function Class:batchSize()
         return math.floor( tonumber( self._config.batch or 0 ) )
     end
 
-    function Class:reset()
+    function Class:rewind()
         local data = self._data
         local config = self._config
-
-        local state = {
-            index = 1,
-            max   = zd.util.get_size( data )
-        }
+        
+        local state = self.state
+        state.max = zd.util.get_size( data )
 
         local order
 
@@ -79,9 +86,7 @@ do
         end
 
         state.order = order
-
-        self.state = state
-        return self.state, state.max
+        return state.max
     end
 
     function Class:next()
@@ -111,6 +116,5 @@ do
         state.index = state.index + 1
 
         return ret, oldindex
-
-
+    end
 end

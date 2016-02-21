@@ -2,11 +2,11 @@ local Evaluator = torch.class('zd.Evaluator')
 
 Evaluator._allow_event_list = {
     "before_epoch"      ,
-      "before_example"    ,
-         "before_feedback" ,
-         "before_loss",
-         "after_example"     ,
-    "after_epoch"       ,
+        "before_example"    ,
+             "before_feedback" ,
+             "before_loss",
+             "after_example"     ,
+        "after_epoch"       ,
 }
 
 function Evaluator:__init(config)
@@ -15,7 +15,7 @@ function Evaluator:__init(config)
     self._config = config
 
     self.feedback = config.feedback
-    self.sampler  = config.sampler
+    -- self.sampler  = config.sampler
     self.events   = config.events or {}
 
     self.name     = config.name
@@ -39,16 +39,19 @@ function Evaluator:__init(config)
 end
 
 function Evaluator:_trigger( event, ... )
-    if self.events[event] ~= nil then
-        return self.events[event](self, ...)
+    local func = self.events[events]
+    if func ~= nil then
+        return func( self, ...)
+    else
+        return nil
     end
 end
 
-function Evaluator:run(model, criterion, data)
+function Evaluator:run(model, criterion, sampler)
     local state = self:_pre_propogate(model)
 
-    if self:_trigger("before_epoch", state) ~= false then
-        self:_propogate(model, criterion, data, state)
+    if false ~= self:_trigger("before_epoch", state) then
+        self:_propogate(model, criterion, sampler, state)
         self:_trigger("after_epoch", state)
     end
 
@@ -68,10 +71,9 @@ function Evaluator:_pre_propogate(model)
     return state
 end
 
-function Evaluator:_propogate(model, criterion, data, state)
-    local data_view, view_size = self.sampler(data)
+function Evaluator:_propogate(model, criterion, sampler, state)
 
-    state.tot_example = view_size
+    state.tot_example = sampler:reset()
 
     for _, example in zd.data_iter(data_view) do
         state.n_example = state.n_example + 1
