@@ -20,7 +20,7 @@ local model = nn.Linear(inDim, outDim, false)
 local criterion = nn.MSECriterion()
 local feedback = optim.ConfusionMatrix(outDim)
 
-function test.TrainerTrain()
+test['Trainer:Train y=Mx'] = function()
     local iter = zd.Iterator {
         source = {
             input  = data,
