@@ -26,7 +26,7 @@ function test.TrainerPropagate()
 
     local iter = zd.Iterator {
         source = {
-            input = data,
+            input  = data,
             target = ans
         }
     }

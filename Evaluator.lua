@@ -16,6 +16,7 @@ function Evaluator:__init(config)
 end
 
 function Evaluator:run(sampler, criterion)
+
     local state = self:_pre_propogate()
 
     if false ~= self:_trigger("before_epoch", state) then
@@ -39,9 +40,13 @@ function Evaluator:_setup(config)
 
     self.cuda     = config.cuda
 
-    self.model    = config.model
-    self.debug    = config.debug
+    if self.cuda then
+        self.model    = config.model:cuda()
+    else
+        self.model    = config.model
+    end
 
+    self.debug    = config.debug
 
     local allow_events = table.transpose( self._allow_event_list )
 

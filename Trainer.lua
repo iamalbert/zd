@@ -38,6 +38,7 @@ function Trainer:_do_example(example, state)
 end
 --]]
 --
+
 function Trainer:_compute_loss(example, state )
     parent._compute_loss(self, example, state )
 
@@ -69,9 +70,7 @@ function Trainer:_pre_propogate()
 
     model:zeroGradParameters()
 
-
     state.optim_state = table.deepcopy( self._config.optim_state or {} )
-    state.optim_config = self._config.optim_config
 
     return state
 end
@@ -80,36 +79,14 @@ function Trainer:_update( example, state )
 
     local params, gradParams = self.params, self.gradParams
 
-    local l2reg = self._config.l2reg or 0
-    local mom   = self._config.momentum or 0
-
-    if l2reg ~= 0 then
-        gradParams:add( l2reg, params )
+    if state.optim_state == nil then
+        state.optim_state = {}
     end
 
-    if mom ~= 0 then
-        do
-            local state = state.optim_state
-            local damp  = mom
-            local dfdx  = gradParams
+    self:_perform_l2reg(self._config.l2reg)
+    self:_perform_momentum(state.optim_state, self._config.momentum)
 
-            if not state.dfdx then
-               state.dfdx = torch.Tensor():typeAs(dfdx)
-                                :resizeAs(dfdx):copy(dfdx)
-            else
-               state.dfdx:mul(mom):add(1-damp, dfdx)
-            end
-            if self._config.nesterov then
-                dfdx:add(mom, state.dfdx)
-            else
-                dfdx = state.dfdx
-            end
-       end
-    end
-
-    -- print(params:sum(), gradParams:sum() )
-    -- print(self._config.optim_config)
-
+    -- parameter update
     self._config.optimizer(
         function (p)
             if params ~= p then params:copy(p) end
@@ -117,6 +94,6 @@ function Trainer:_update( example, state )
         end,
         params, self._config.optim_config, state.optim_state
     )
-    -- print(params:sum(), gradParams:sum() )
+
     self.model:zeroGradParameters()
 end

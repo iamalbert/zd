@@ -1,11 +1,14 @@
 zd = {
-    version = 0.1
+    __version = 0.1
 }
 
 require 'nn'
 
 local modules = {
     'util', 
+
+    'optims/util',
+    'optims/rmsprop',
 
     'Data',
     'Evaluator',
