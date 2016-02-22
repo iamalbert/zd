@@ -83,8 +83,10 @@ function Trainer:_update( example, state )
         state.optim_state = {}
     end
 
-    self:_perform_l2reg(self._config.l2reg)
-    self:_perform_momentum(state.optim_state, self._config.momentum)
+    local l2reg = self._config.l2reg or 0
+    if l2reg ~= 0 then
+        zd.optim_util._perform_l2reg( parameter, gradParams, l2reg )
+    end
 
     -- parameter update
     self._config.optimizer(

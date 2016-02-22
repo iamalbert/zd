@@ -1,3 +1,4 @@
+require 'optim'
 --[[ ADAGRAD implementation for SGD
 
 ARGS:
@@ -49,7 +50,7 @@ function optim.adagrad(opfunc, x, config, state)
    if mom ~= 0 then
         -- perform momentum
         dfdx:cdiv(state.paramStd:add(1e-10))
-        zd.optim._perform_momentum(x, dfdx, config, state)
+        zd.optim_util._perform_momentum(x, dfdx, config, state)
         x:add(-clr, dfdx)
    else
        x:addcdiv(-clr, dfdx,state.paramStd:add(1e-10))

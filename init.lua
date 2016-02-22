@@ -9,6 +9,7 @@ local modules = {
 
     'optims/util',
     'optims/rmsprop',
+    'optims/adagrad',
 
     'Data',
     'Evaluator',

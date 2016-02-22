@@ -20,7 +20,8 @@ RETURN:
 
 ]]
 
-function zd.optim.rmsprop(opfunc, x, config, state)
+require 'optim'
+function optim.rmsprop(opfunc, x, config, state)
     -- (0) get/update state
     local config = config or {}
     local state = state or config
@@ -48,7 +49,7 @@ function zd.optim.rmsprop(opfunc, x, config, state)
     if mom ~= 0 then
         -- (5) perform momentum
         dfdx:cdiv(state.tmp)
-        zd.optim._perform_momentum(x, dfdx, config, state)
+        zd.optim_util._perform_momentum(x, dfdx, config, state)
         x:add(-lr, dfdx)
     else
         x:addcdiv(-lr, dfdx, state.tmp)

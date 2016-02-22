@@ -1,12 +1,12 @@
-zd.optim = {}
+zd.optim_util = {}
 
-function zd.optim._perform_l2reg(x, dfdx, l2reg)
+function zd.optim_util._perform_l2reg(x, dfdx, l2reg)
     if l2reg ~= nil and l2reg ~= 0 then
         dfdx:add( l2reg, dfdx )
     end
 end
 
-function zd.optim._perform_momentum(x, dfdx, config, state)
+function zd.optim_util._perform_momentum(x, dfdx, config, state)
 	-- copy from torch/optim.sgd
 
 	local mom  = config.momentum or 0 
