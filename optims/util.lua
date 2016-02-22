@@ -22,7 +22,7 @@ function zd.optim._perform_momentum(x, dfdx, config, state)
 		if nesterov then
 			dfdx:add(mom, state.dfdx)
 	    else
-			dfdx = state.dfdx
+			dfdx:copy(state.dfdx)
 	    end
 	end
 end

@@ -1,4 +1,3 @@
-
 --[[ An implementation of RMSprop
 
 ARGS:
@@ -44,10 +43,16 @@ function zd.optim.rmsprop(opfunc, x, config, state)
 
     -- (4) perform update
     state.tmp:sqrt(state.m):add(epsilon)
-    x:addcdiv(-lr, dfdx, state.tmp)
 
-	-- (5) perform momentum
-	zd.optim._perform_momentum(x, dfdx, config, state)
+    local mom = config.momentum or 0
+    if mom ~= 0 then
+        -- (5) perform momentum
+        dfdx:cdiv(state.tmp)
+        zd.optim._perform_momentum(x, dfdx, config, state)
+        x:add(-lr, dfdx)
+    else
+        x:addcdiv(-lr, dfdx, state.tmp)
+    end
 
     -- return x*, f(x) before optimization
     return x, {fx}
