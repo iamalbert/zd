@@ -14,6 +14,7 @@ local modules = {
     'Data',
     'Evaluator',
     'Trainer',
+    'Expr',
 
     'FSM',
     'Tree',
