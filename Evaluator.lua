@@ -15,7 +15,7 @@ function Evaluator:__init(config)
     self:_setup(config)
 end
 
-function Evaluator:run(sampler, criterion)
+function Evaluator:run(sampler)
 
     local state = self:_pre_propogate()
 

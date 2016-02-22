@@ -10,13 +10,40 @@ local test = {}
 
 local tester = totem.Tester()
 
-local n_data, inDim, outDim = 100, 30, 40
+local n_data, inDim, outDim = 1000, 30, 3
 local data = torch.rand( n_data, inDim )
-local ans  = torch.rand( n_data, outDim )
 
-local model = nn.Linear(inDim, outDim)
-local criterion = nn.AbsCriterion()
+local weight = torch.rand(outDim, inDim)
+local ans  = data * (weight:t())
+
+local model = nn.Linear(inDim, outDim, false)
+local criterion = nn.MSECriterion()
 local feedback = optim.ConfusionMatrix(outDim)
+
+function test.TrainerTrain()
+    local iter = zd.Iterator {
+        source = {
+            input  = data,
+            target = ans
+        }
+    }
+
+    local trainer = zd.Trainer {
+        model = model,
+        criterion = criterion, 
+        optimizer = optim.sgd,
+        optim_config = {
+            learningRate = 0.03
+        }
+    }
+
+    for e=1,50 do
+        trainer:run(iter)
+    end
+
+    tester:assertTensorEq( model.weight, weight, 1e-7, 
+        "failed to train y=Mx, where M: [" .. outDim .. "x" .. inDim .. "]")
+end
 
 function test.TrainerPropagate()
     local called = {}
