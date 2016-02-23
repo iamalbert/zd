@@ -29,6 +29,10 @@ function Trainer:_setup(config)
     self.criterion = config.criterion
     self.optimizer = config.optimizer
 
+    if self.cuda then
+        self.criterion = self.criterion:cuda()
+    end
+
     self.params , self.gradParams = self.model:getParameters()
 end
 
@@ -62,7 +66,7 @@ function Trainer:_pre_propogate()
 
     -- if self.params == nil or self.gradParams == nil then
     -- end
-    --
+
     local model = self.model
 
     model:training()
@@ -71,6 +75,7 @@ function Trainer:_pre_propogate()
     model:zeroGradParameters()
 
     state.optim_state = table.deepcopy( self._config.optim_state or {} )
+    state.optim_config = self._config.optim_config or {}
 
     return state
 end
@@ -79,13 +84,14 @@ function Trainer:_update( example, state )
 
     local params, gradParams = self.params, self.gradParams
 
+    local optim_config = state.optim_config or {}
     if state.optim_state == nil then
         state.optim_state = {}
     end
 
-    local l2reg = self._config.l2reg or 0
+    local l2reg = optim_config.l2reg or 0
     if l2reg ~= 0 then
-        zd.optim_util._perform_l2reg( parameter, gradParams, l2reg )
+        zd.optim_util._perform_l2reg( params, gradParams, l2reg )
     end
 
     -- parameter update
@@ -94,7 +100,7 @@ function Trainer:_update( example, state )
             if params ~= p then params:copy(p) end
             return example.loss, gradParams
         end,
-        params, self._config.optim_config, state.optim_state
+        params, optim_config, state.optim_state
     )
 
     self.model:zeroGradParameters()

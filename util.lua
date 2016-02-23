@@ -163,6 +163,12 @@ local util_impl = {
         end
     end,
 
+    recursive_cuda = function(obj)
+        return zd.util.recursive_find_tensor(obj, function(o)
+            return o:cuda()
+        end)
+    end,
+
     nop = function (...) end,
     identity = function(...) return ... end,
 
