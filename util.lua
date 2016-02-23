@@ -25,6 +25,10 @@ string.escape = function(str)
     return s
 end
 
+string.trim = function(s)
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 function string.startswith( self, prefix )
     return string.match( self, "^".. prefix ) ~= nil
 end

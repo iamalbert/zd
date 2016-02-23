@@ -8,7 +8,9 @@ do
         self._source = config.source
         self._config = config
         self._cuda = config.cuda
+        self._callback = config.callback
     end
+
     function Class:cuda(opt)
         if opt == false  then
             self._cuda = false
@@ -35,6 +37,12 @@ do
 
     function Class:next()
         local ret = self:current()
+
+        assert( ret ~= nil, "::current() return value is nil" )
+        if self._callback then
+            ret = self._callback(ret)
+            assert( ret ~= nil, "callback() return value is nil" )
+        end
 
         local state = self.state
         local oldindex = state.index
