@@ -75,7 +75,7 @@ function Trainer:_pre_propogate()
     model:zeroGradParameters()
 
     state.optim_state = table.deepcopy( self._config.optim_state or {} )
-    state.optim_config = self._config.optim_config or {}
+    state.optim_config = self._config.optim_config 
 
     return state
 end
