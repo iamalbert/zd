@@ -22,3 +22,13 @@ end
 
 function Class:updateGradParameters(input, gradInput)
 end
+
+function Class:__tostring()
+	local sz = self.source:size():totable()
+	local insz = table.remove( sz, 1 )
+	return torch.type(self) .. 
+		string.format("( [%d] -> %s )", 
+			insz,
+			table.concat(sz, " x ")
+		)
+end
