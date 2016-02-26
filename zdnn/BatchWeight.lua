@@ -1,5 +1,5 @@
 
-local Class,Parent = torch.class('zdnn.AdaptiveWeight', 'nn.Sequential')
+local Class,Parent = torch.class('zdnn.BatchWeight', 'nn.Sequential')
 
 function Class:__init( dim, bias )
 	Parent.__init(self)

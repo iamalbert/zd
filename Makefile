@@ -26,8 +26,12 @@ install:
 
 	mkdir -p $(LUADIR)/zd
 	cp *.lua $(LUADIR)/zd
-	cp -r optims/* $(LUADIR)/zd
-	cp -r zdnn/* $(LUADIR)/zd
+
+	mkdir -p $(LUADIR)/zd/optims
+	cp optims/*.lua $(LUADIR)/zd/optims
+
+	mkdir -p $(LUADIR)/zd/zdnn
+	cp zdnn/*.lua $(LUADIR)/zd/zdnn
 test:
 	@echo --- test
 	$(TORCH_DIR)/bin/totem-run --folder tests

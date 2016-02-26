@@ -25,7 +25,7 @@ local modules = {
     'TreeNN',
 
     'zdnn/FrozenLookupTable',
-    'zdnn/AdaptiveWeight',
+    'zdnn/BatchWeight',
 }
 
 for _, file in ipairs( modules ) do
