@@ -2,6 +2,10 @@ zd = {
     __version = 0.1
 }
 
+zdnn = {
+    __version = 0.1
+}
+
 require 'nn'
 
 local modules = {
@@ -18,7 +22,9 @@ local modules = {
 
     'FSM',
     'Tree',
-    'TreeNN'
+    'TreeNN',
+
+    'zdnn/FrozenLookupTable'
 }
 
 for _, file in ipairs( modules ) do

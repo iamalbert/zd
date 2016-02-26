@@ -26,8 +26,15 @@ function Class:run()
     local state = {
         n_epoch = 0
     }
+    local cb
     while state.n_epoch ~= self.max_epoch do
         state.n_epoch = state.n_epoch + 1
+
+        cb = self.events.before_epoch
+        if cb ~= nil then
+            local to_continue = cb(self, state) 
+            if to_continue == false then break end
+        end
 
         local reports = {}
         for k, value in ipairs(self.runners) do
@@ -37,11 +44,13 @@ function Class:run()
             table.insert(reports, report)
             collectgarbage()
         end
-        local cb = self.events.after_epoch 
+
+        cb = self.events.after_epoch 
         if cb ~= nil then
             local to_continue = cb(self, state, reports) 
             if to_continue == false then break end
         end
+
     end
 end
 
