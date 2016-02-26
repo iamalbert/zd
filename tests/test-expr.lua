@@ -11,7 +11,7 @@ local in_dim, out_dim = 10, 30
 
 local weight = torch
 
-function test.A()
+test['Expr: events'] = function()
     
     local cnt = 0
     local max_epoch = 50

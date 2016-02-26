@@ -10,7 +10,7 @@ description = {
         my deep learning framework
    ]],
    homepage = "git@github.com:iamalbert/zd.git",
-   license = "MIT"
+   license = "GPLv3"
 }
 dependencies = {
    "torch >= 7.0",
