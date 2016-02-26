@@ -1,5 +1,6 @@
 #!/usr/bin/env th
 
+require 'zd'
 require 'totem'
 
 local test = {}
