@@ -1,20 +1,27 @@
+require 'nn'
 
 local Class,Parent = torch.class('zdnn.BatchWeight', 'nn.Sequential')
 
-function Class:__init( dim, bias )
+function Class:__init(dim, n_layers)
 	Parent.__init(self)
 
 	self.dim = dim
 
-	local module = nn.Linear(dim,1,bias)
-	self :add( module )              -- N x 1
-		 :add(nn.View(-1))           -- N
-		 :add(nn.SoftMax())          -- N
-		 :add(nn.View(-1,1))         -- N x 1
+	n_layers = n_layers or 0
+
+	for i=1,n_layers do
+		self:add( nn.Linear(dim,dim) ):add( nn.Tanh() )
+	end
+
+							        -- N x dim [input]
+	self:add( nn.Linear(dim,1) )    -- N x 1
+
+	self :add(nn.View(-1))       -- N
+		 :add(nn.SoftMax())      -- N
+		 :add(nn.View(-1,1))     -- N x 1
 end
 
 function Class:__tostring()
-	return torch.type(self) .. string.format( "( [n,%d] -> [n,1] )",
-		self.dim
-	)
+	return torch.type(self) ..
+		string.format( "( [n,%d] -> [n,1] )", self.dim )
 end
