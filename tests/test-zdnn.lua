@@ -56,6 +56,7 @@ function test.FrozenLookupTableMaskedZero()
     local model = zdnn.FrozenLookupTable(db,true)
 
     local zero = torch.zeros(dim)
+
     for _, indices in ipairs(indices_list) do
         local out = model:forward( torch.LongTensor(indices) )
 
@@ -71,7 +72,7 @@ function test.FrozenLookupTableMaskedZero()
                     out[i],
                     zero,
                     1e-7,
-                    "output tensor error"
+                    "output tensor shoule be zero"
                 )
             else
                 tester:assertTensorEq(

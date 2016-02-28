@@ -11,6 +11,7 @@ function Class:__init( source, maskzero)
 	self.maskzero = maskzero
 	if maskzero then
 		self.source = source:sub(1,-1,1,-1):resize( source:size(1)+1, source:size(2) )
+		self.source:sub( -1,-1 ):fill(0)
 	else
 		self.source = source
 	end
