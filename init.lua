@@ -27,6 +27,7 @@ local modules = {
 
     'zdnn/FrozenLookupTable',
     'zdnn/BatchWeight',
+    'zdnn/JoinTableFixed'
 }
 
 for _, file in ipairs( modules ) do

@@ -1,5 +1,3 @@
-require 'nn'
-
 local Class, Parent = torch.class('zdnn.FrozenLookupTable', 'nn.Module')
 
 function Class:__init( source, maskzero)
@@ -23,6 +21,8 @@ function Class:updateOutput(input)
 		input = input:clone()
 		input:maskedFill( input:eq(0), self.source:size(1) )
 	end
+
+	input = input:long()
 
 	if input:dim() == 1 then
 	    self.output:index(self.source, 1, input)

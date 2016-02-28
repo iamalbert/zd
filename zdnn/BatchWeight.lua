@@ -1,5 +1,3 @@
-require 'nn'
-
 local Class,Parent = torch.class('zdnn.BatchWeight', 'nn.Sequential')
 
 function Class:__init(dim, n_layers)
