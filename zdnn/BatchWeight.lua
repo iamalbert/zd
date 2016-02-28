@@ -13,13 +13,16 @@ function Class:__init(dim, n_layers)
 		self:add( nn.Linear(dim,dim) ):add( nn.Tanh() )
 	end
 
+	self.mod = nn.Linear(dim,1, false)
+
 							        -- N x dim [input]
-	self:add( nn.Linear(dim,1) )    -- N x 1
+	self:add( self.mod )            -- N x 1
 
 	self :add(nn.View(-1))       -- N
 		 :add(nn.SoftMax())      -- N
 		 :add(nn.View(-1,1))     -- N x 1
 end
+
 
 function Class:__tostring()
 	return torch.type(self) ..

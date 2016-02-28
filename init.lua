@@ -1,3 +1,6 @@
+require 'nn'
+require 'optim'
+
 zd = {
     __version = 0.1
 }
@@ -5,8 +8,6 @@ zd = {
 zdnn = {
     __version = 0.1
 }
-
-require 'nn'
 
 local modules = {
     'util', 

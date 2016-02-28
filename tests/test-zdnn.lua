@@ -27,7 +27,7 @@ function test.FrozenLookupTable()
         tester:assertTableEq( 
             out:size():totable(), 
             { #indices, dim },
-            1e-20,
+            1e-7,
             "output tensor size mismatch with input"
         )
         for i = 1,#indices do
@@ -37,6 +37,50 @@ function test.FrozenLookupTable()
                 1e-7,
                 "output tensor error"
             )
+        end
+    end
+    -- add test code here, using tester:asserteq methods
+end
+
+
+function test.FrozenLookupTableMaskedZero()
+    local dim = 40
+    local db = torch.rand( 30, dim )
+    
+    local indices_list = {
+        {1,21,30,24,16,0,1,9,10}, 
+        {25,12,7,24,0,8,6,19,15,1},
+        {0,0,6,2,11,30,29,3,14,8,8,23,25,0,0,19,25,14,3,4,17,14,20,23,6,18,16,24,10,10,19,30,6,18,27,24,16,20,5,2,4,5,14,19,23,20,16,18,4,6,13,5,24,18,10,30,16,16,11,16,18,17,3,29,21,26,10,15,13,8,4,9,19,18,3,16,30,11,22,14,0,22,11,3,4,5,3,2,3,26,0,0,21,18,25,21,19,26,22,11,16,15,0,0},
+    }
+
+    local model = zdnn.FrozenLookupTable(db,true)
+
+    local zero = torch.zeros(dim)
+    for _, indices in ipairs(indices_list) do
+        local out = model:forward( torch.LongTensor(indices) )
+
+        tester:assertTableEq( 
+            out:size():totable(), 
+            { #indices, dim },
+            1e-7,
+            "output tensor size mismatch with input"
+        )
+        for i = 1,#indices do
+            if indices[i] == 0 then
+                tester:assertTensorEq(
+                    out[i],
+                    zero,
+                    1e-7,
+                    "output tensor error"
+                )
+            else
+                tester:assertTensorEq(
+                    out[i],
+                    db[ indices[i] ],
+                    1e-7,
+                    "output tensor error"
+                )
+            end
         end
     end
     -- add test code here, using tester:asserteq methods

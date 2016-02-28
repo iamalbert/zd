@@ -1,26 +1,43 @@
 require 'nn'
 
-local Class, Parent = torch.class('zdnn.FrozenLookupTable', 'nn.LookupTable')
+local Class, Parent = torch.class('zdnn.FrozenLookupTable', 'nn.Module')
 
-function Class:__init( source, out_policy)
-	nn.Module.__init(self)
+function Class:__init( source, maskzero)
+	Parent.__init(self)
 
 	assert( zd.util.isTensor(source), "source must be a Tensor" )
 	assert( source:dim() >= 2, "source must have at least 2 dimension")
 
-	self.weight = source:clone()
-	-- self.gradWeight = torch.Tensor( source:size(1), source:size(2) )
-	self.paddingValue =  0
+	self.maskzero = maskzero
+	if maskzero then
+		self.source = source:sub(1,-1,1,-1):resize( source:size(1)+1, source:size(2) )
+	else
+		self.source = source
+	end
 end
 
-function Class:reset()
+
+function Class:updateOutput(input)
+	if self.maskzero then
+		input = input:clone()
+		input:maskedFill( input:eq(0), self.source:size(1) )
+	end
+
+	if input:dim() == 1 then
+	    self.output:index(self.source, 1, input)
+	elseif input:dim() == 2 then
+	    self.output:index(self.source, 1, input:view(-1))
+	    self.output = self.output:view(input:size(1), input:size(2), self.source:size(2))
+	else
+	    error("input must be a vector or matrix")
+	end
+	return self.output
 end
 
-function Class:accGradParameters()
-end
+
 
 function Class:__tostring()
-	local sz = self.weight:size():totable()
+	local sz = self.source:size():totable()
 	local insz = table.remove( sz, 1 )
 	return torch.type(self) .. 
 		string.format("( [%d] -> %s )", 

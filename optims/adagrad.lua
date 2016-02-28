@@ -1,4 +1,3 @@
-require 'optim'
 --[[ ADAGRAD implementation for SGD
 
 ARGS:

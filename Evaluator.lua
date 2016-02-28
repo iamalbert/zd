@@ -119,13 +119,15 @@ end
 function Evaluator:_do_example( example, state )
     example.output = self.model:forward(example.input)
 
-    if false ~= self:_trigger("before_feedback",state,example) then
-      self:_add_feedback(example, state)
-    end
 
     if false ~= self:_trigger("before_loss", state, example ) then
         self:_compute_loss( example, state )
     end
+
+    if false ~= self:_trigger("before_feedback",state,example) then
+      self:_add_feedback(example, state)
+    end
+
 end
 
 function Evaluator:_compute_loss( example, state )

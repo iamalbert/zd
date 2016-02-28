@@ -20,7 +20,7 @@ RETURN:
 
 ]]
 
-require 'optim'
+
 function optim.rmsprop(opfunc, x, config, state)
     -- (0) get/update state
     local config = config or {}
