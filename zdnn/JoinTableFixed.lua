@@ -12,7 +12,12 @@ end
 
 function Class:updateGradInput(input, gradOutput)
 	if gradOutput == nil or gradOutput:dim() == 0 then
-		self.gradInput = nil
+		self.gradInput = {}
+		if gradOutput ~= nil then
+			for i = 1,#input do
+				self.gradInput[i] = gradOutput
+			end
+		end
 		return self.gradInput
 	else
 		return Parent.updateGradInput(self,input, gradOutput)

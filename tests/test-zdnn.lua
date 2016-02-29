@@ -27,6 +27,25 @@ test['JoinTable (from torch)'] = function()
    end
 end
 
+test['JoinTable: empty gradOutput'] = function()
+   local tensor = torch.rand(3,4,5)
+   local module = zdnn.JoinTable(1)
+   local empty = torch.Tensor()
+   
+   local input = { tensor, tensor, tensor }
+   local out = module:forward(input)
+
+   local gi
+   gi = module:backward( input, nil )
+
+   tester:asserteq( #gi, 0, "gradInput should be {}")
+
+   gi = module:backward( input, empty )
+   for i = 1,#input do
+       tester:assertTensorEq( gi[i] , empty, 0,
+          "gradInput[" .. i .. "] shoule be an empty tensor")
+   end
+end
 
 test['JoinTable: same type'] = function()
    local tensor = torch.rand(3,4,5)
