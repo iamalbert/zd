@@ -4,8 +4,10 @@ function Class:__init(dim,nInputDims)
 	Parent.__init(self,dim,nInputDims)
 end
 function Class:updateOutput(input)
-   self.output:typeAs(input[1]):resize(self.size)
-   return Parent.updateOutput(input)
+   Parent.updateOutput(self,input)
+   self.output = self.output:type(input[1]:type())
+   -- print(self.output:type(), input[1]:type() )
+   return self.output
 end
 
 function Class:updateGradInput(input, gradOutput)
@@ -13,6 +15,6 @@ function Class:updateGradInput(input, gradOutput)
 		self.gradInput = nil
 		return self.gradInput
 	else
-		return Parent.updateGradInput(input, gradOutput)
+		return Parent.updateGradInput(self,input, gradOutput)
 	end
 end

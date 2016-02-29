@@ -8,6 +8,71 @@ local test = {}
 
 local tester = totem.Tester()
 
+test['JoinTable (from torch)'] = function()
+   local tensor = torch.rand(3,4,5)
+   local input = {tensor, tensor}
+   local module
+   for d = 1,tensor:dim() do
+      module = zdnn.JoinTable(d)
+      tester:asserteq(module:forward(input):size(d), tensor:size(d)*2, "dimension " .. d)
+   end
+
+   -- Minibatch
+   local tensor = torch.rand(3,4,5)
+   local input = {tensor, tensor}
+   local module
+   for d = 1,tensor:dim()-1 do
+      module = zdnn.JoinTable(d, 2)
+      tester:asserteq(module:forward(input):size(d+1), tensor:size(d+1)*2, "dimension " .. d)
+   end
+end
+
+
+test['JoinTable: same type'] = function()
+   local tensor = torch.rand(3,4,5)
+   local module
+
+   local types = { 
+        "torch.LongTensor", -- "torch.FloatTensor", 
+        -- "torch.IntTensor", "torch.DoubleTensor" 
+   }
+
+   for _,Type in ipairs(types) do
+       tensor = tensor:type(Type)
+
+       local input = {tensor, tensor}
+
+       for d = 1,tensor:dim() do
+          module = zdnn.JoinTable(d)
+          local out = module:forward(input)
+          local sz = tensor:size(d)
+
+          tester:asserteq(out:type(), tensor:type(), "type different")
+          tester:asserteq(out:size(d), sz*2, "dimension " .. d)
+          tester:assertTensorEq(out:narrow(d, 1,sz), tensor, 1e-7, "value error")
+          tester:assertTensorEq(out:narrow(d,sz,sz), tensor, 1e-7, "value error")
+       end
+   end
+
+   -- Minibatch
+   local tensor = torch.rand(3,4,5)
+   local module
+
+   for _,Type in ipairs(types) do
+       tensor = tensor:type(Type)
+       local input = {tensor, tensor}
+
+       for d = 1,tensor:dim()-1 do
+          module = zdnn.JoinTable(d, 2)
+          local out = module:forward(input)
+          local sz = tensor:size(d)
+
+          tester:asserteq(out:type(), tensor:type(), "type different")
+          tester:asserteq(out:size(d+1), tensor:size(d+1)*2, "dimension " .. d)
+       end
+   end
+end
+
 
 function test.FrozenLookupTable()
     local dim = 40
