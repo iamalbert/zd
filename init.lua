@@ -1,4 +1,5 @@
 require 'nn'
+require 'rnn'
 require 'optim'
 
 zd = {
@@ -25,9 +26,14 @@ local modules = {
     'Tree',
     'TreeNN',
 
+    'zdnn/init',
     'zdnn/FrozenLookupTable',
     'zdnn/BatchWeight',
-    'zdnn/JoinTableFixed'
+    'zdnn/JoinTableFixed',
+    'zdnn/FilterTarget',
+    'zdnn/Slice',
+    'zdnn/ReplicateAs',
+    'zdnn/Sequencer'
 }
 
 for _, file in ipairs( modules ) do

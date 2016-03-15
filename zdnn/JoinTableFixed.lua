@@ -1,3 +1,5 @@
+if zdnn.JoinTable then return end
+
 local Class, Parent = torch.class('zdnn.JoinTable', 'nn.JoinTable')
 
 function Class:__init(dim,nInputDims) 
