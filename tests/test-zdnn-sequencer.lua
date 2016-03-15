@@ -1,11 +1,11 @@
 #!/usr/bin/env th
 
 require 'zd'
-require 'totem'
 
-local test = totem.TestSuite()
 
-local tester = totem.Tester()
+local test = torch.TestSuite()
+
+local tester = torch.Tester()
 
 
 local m = zdnn.Sequencer( nn.FastLSTM(3,5) )

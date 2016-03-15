@@ -1,11 +1,11 @@
 #!/usr/bin/env th
 
-require 'totem'
+
 require 'zd'
 
-local test = {}
+local test = torch.TestSuite()
 
-local tester = totem.Tester()
+local tester = torch.Tester()
 
 local in_dim, out_dim = 10, 30
 

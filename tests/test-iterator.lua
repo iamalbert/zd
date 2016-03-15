@@ -1,11 +1,11 @@
 #!/usr/bin/env th
 
-require 'totem'
+
 require 'zd'
 
-local test = {}
+local test = torch.TestSuite()
 
-local tester = totem.Tester()
+local tester = torch.Tester()
 
 local inputs  = torch.rand( 883, 40, 500 )
 local targets = torch.rand( 883, 1)

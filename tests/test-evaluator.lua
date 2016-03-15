@@ -2,13 +2,13 @@
 
 require 'nn'
 require 'optim'
-require 'totem'
+
 
 require 'zd'
 
-local test = {}
+local test = torch.TestSuite()
 
-local tester = totem.Tester()
+local tester = torch.Tester()
 
 local n_data, inDim, outDim = 100, 30, 40
 local data = torch.rand( n_data, inDim )

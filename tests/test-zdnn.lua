@@ -1,12 +1,12 @@
 #!/usr/bin/env th
 
-require 'totem'
+
 require 'nn'
 require 'zd'
 
-local test = {}
+local test = torch.TestSuite()
 
-local tester = totem.Tester()
+local tester = torch.Tester()
 
 test['JoinTable (from torch)'] = function()
    local tensor = torch.rand(3,4,5)

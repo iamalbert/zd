@@ -1,11 +1,11 @@
 #!/usr/bin/env th
 
 require 'zd'
-require 'totem'
 
-local test = {}
 
-local tester = totem.Tester()
+local test = torch.TestSuite()
+
+local tester = torch.Tester()
 
 
 function test.RecursiveFindTensor()
