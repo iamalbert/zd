@@ -5,6 +5,8 @@ LUA_LIBDIR ?= $(TORCH_DIR)/lib
 
 CFLAGS ?=-std=c99 -Wall -pedantic -O2 -I$(LUA_INCDIR)/TH -I$(LUA_INCDIR)
 
+TEST_DIR := tests
+
 all: build
 
 build:
@@ -34,6 +36,6 @@ install:
 	cp zdnn/*.lua $(LUADIR)/zd/zdnn
 test:
 	@echo --- test
-	$(TORCH_DIR)/bin/totem-run --folder tests
+	find $(TEST_DIR) -name "*.lua" -exec th {} \;
 
 clean:
