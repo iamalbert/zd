@@ -1,6 +1,7 @@
 require 'nn'
 require 'rnn'
 require 'optim'
+require 'nngraph'
 
 zd = {
     __version = 0.1
