@@ -8,7 +8,7 @@ local test = torch.TestSuite()
 local tester = torch.Tester()
 
 
-function test.RecursiveFindTensor()
+function test.RecursiveCuda()
     require 'cutorch'
 
     local i = {

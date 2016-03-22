@@ -16,7 +16,7 @@ local glin = zdnn.GeneralLinear(inDim, outDim)
 glin.weight:copy( lin.weight )
 glin.bias:copy( lin.bias)
 
-test['GeneralLinear:forward'] = function ()
+test['GeneralLinear: forward'] = function ()
     lin:evaluate()
     glin:evaluate()
     for i=1,10 do
@@ -29,7 +29,7 @@ test['GeneralLinear:forward'] = function ()
     end
 end
 
-test['GeneralLinear:forward (batch)'] = function ()
+test['GeneralLinear: forward (batch)'] = function ()
     lin:evaluate()
     glin:evaluate()
     for i=1,10 do
@@ -43,7 +43,7 @@ test['GeneralLinear:forward (batch)'] = function ()
 end
 
 
-test['GeneralLinear:forward (multi-dim batch)'] = function ()
+test['GeneralLinear: forward (multi-dim batch)'] = function ()
     lin:evaluate()
     glin:evaluate()
     for i=1,10 do
@@ -66,7 +66,7 @@ test['GeneralLinear:forward (multi-dim batch)'] = function ()
     end
 end
 
-test['GeneralLinear:backward'] = function ()
+test['GeneralLinear: backward'] = function ()
     lin:training()
     glin:training()
 
@@ -92,7 +92,7 @@ test['GeneralLinear:backward'] = function ()
     end
 end
 
-test['GeneralLinear:backward (batch)'] = function ()
+test['GeneralLinear: backward (batch)'] = function ()
     lin:training()
     glin:training()
 
@@ -117,7 +117,7 @@ test['GeneralLinear:backward (batch)'] = function ()
         )
     end
 end
-test['GeneralLinear:backward (multi-dim batch)'] = function ()
+test['GeneralLinear: backward (multi-dim batch)'] = function ()
     lin:training()
     glin:training()
 
