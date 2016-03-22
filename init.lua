@@ -34,7 +34,8 @@ local modules = {
     'zdnn/FilterTarget',
     'zdnn/Slice',
     'zdnn/ReplicateAs',
-    'zdnn/Sequencer'
+    'zdnn/Sequencer',
+    'zdnn/GeneralLinear'
 }
 
 for _, file in ipairs( modules ) do
