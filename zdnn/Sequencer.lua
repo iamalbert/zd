@@ -21,8 +21,11 @@ function Class:updateOutput(input)
     
     if dim == 2 then
         local i = input:view( input:size(1), 1, input:size(2) )
+        assert(i:eq(i):all())
         local o = self.seq:forward(i)
+        assert(o:eq(o):all())
         self.output = o:squeeze(2)
+        assert(self.output:eq(self.output):all())
     else
         self.output = self.seq:forward(input)
     end

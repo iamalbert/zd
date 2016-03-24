@@ -1,47 +1,79 @@
 #!/usr/bin/env th
 
 require 'zd'
+require 'totem'
 
+local test = totem.TestSuite()
 
-local test = torch.TestSuite()
+local tester = totem.Tester()
 
-local tester = torch.Tester()
+local inDim, outDim = 300, 100
+local seqLen = 956
 
+local rec = nn.GRU(inDim, outDim)
+local zm = zdnn.Sequencer(rec)
+local rm = nn.Sequencer(rec:clone())
 
-local m = zdnn.Sequencer( nn.FastLSTM(3,5) )
+test["Sequencer:forward: 1-batch"] = function()
+    local input = torch.rand(seqLen, 1, inDim)
+    local input_table = nn.SplitTable(1):forward( input )
 
-test["Sequencer: 1-batch"] = function()
-    local out = m:forward( torch.rand(4, 1, 3) )
-    tester:assertTableEq(
-        out:size():totable(), {4, 1, 5},
-        1e-8, "output size mismatch " .. 
-            table.concat(out:size():totable(), 'x')
+    tester:assertGeneralEq( #input_table, input:size(1),
+        1e-8, "split length incorrect")
+    tester:assertGeneralEq( input_table[1], input[1],
+        1e-8, "split incorrect")
+
+    zm:evaluate()
+    rm:evaluate()
+    local pred = zm:forward( input )
+    local pred_table = rm:forward( input_table )
+
+    tester:assertGeneralEq( 
+        pred:size(), torch.LongStorage{seqLen, 1, outDim},
+        1e-8, "size should be " .. seqLen .. " x 1 x " .. outDim
     )
 
-    local gI = m:backward( torch.rand(4,1,3), torch.rand(4,1,5) )
-    tester:assertTableEq(
-        gI:size():totable(), {4, 1, 3},
-        1e-8, "gradInput size mismatch " .. 
-            table.concat(gI:size():totable(), 'x')
-    )
+    for i=1,seqLen do
+        tester:assertGeneralEq(
+            pred[i], pred_table[i],
+            1e-8, "step " .. i .. " is different"
+        )
+    end
 end
 
-test["Sequencer: n-batch"] = function()
-    local out = m:forward( torch.rand(4, 7, 3) )
-    tester:assertTableEq(
-        out:size():totable(), {4, 7, 5},
-        1e-8, "output size mismatch " .. table.concat(out:size():totable(), 'x')
+test["Sequencer:forward: n-batch"] = function()
+
+    local batchSize = 12
+
+    local input = torch.rand(seqLen, batchSize, inDim)
+    local input_table = nn.SplitTable(1):forward( input )
+
+    tester:assertGeneralEq( #input_table, input:size(1),
+        1e-8, "split length incorrect")
+    tester:assertGeneralEq( input_table[1], input[1],
+        1e-8, "split incorrect")
+
+    zm:evaluate()
+    rm:evaluate()
+    local pred = zm:forward( input )
+    local pred_table = rm:forward( input_table )
+
+    tester:assertGeneralEq( 
+        pred:size(), torch.LongStorage{seqLen, batchSize, outDim},
+        1e-8, 
+        "size should be " .. seqLen .. " x " .. batchSize .. " x " .. outDim
     )
 
-    local gI = m:backward( torch.rand(4,7,3), torch.rand(4,7,5) )
-    tester:assertTableEq(
-        gI:size():totable(), {4, 7, 3},
-        1e-8, "gradInput size mismatch " .. 
-            table.concat(gI:size():totable(), 'x')
-    )
+    for i=1,seqLen do
+        tester:assertGeneralEq(
+            pred[i], pred_table[i],
+            1e-8, "step " .. i .. " is different"
+        )
+    end
 end
 
-test["Sequencer: error input"] = function()
+--[[
+test["Sequencer:forward: error input"] = function()
     local input  = torch.rand(4)
     tester:assertError( function()
         m:forward( input )
@@ -52,23 +84,33 @@ test["Sequencer: error input"] = function()
         m:forward( input )
     end)
 end
+--]]
 
+test["Sequencer:forward: no-batch"] = function ()
+    local input = torch.rand(seqLen, inDim)
+    local input_table = nn.SplitTable(1):forward( input )
 
-test["Sequencer: no-batch"] = function ()
-    local input  = torch.rand(4, 3)
-    local output = m:forward( input )
+    tester:assertGeneralEq( #input_table, input:size(1),
+        1e-8, "split length incorrect")
+    tester:assertGeneralEq( input_table[1], input[1],
+        1e-8, "split incorrect")
 
-    tester:assertTableEq(
-        output:size():totable(), {4, 5},
-        1e-8, "output size mismatch " .. 
-            table.concat(output:size():totable(), 'x')
+    zm:evaluate()
+    rm:evaluate()
+    local pred = zm:forward( input )
+    local pred_table = rm:forward( input_table )
+
+    tester:assertGeneralEq( 
+        pred:size(), torch.LongStorage{seqLen, outDim},
+        1e-8, "size should be " .. seqLen .. " x " .. outDim
     )
-    local gI = m:backward( torch.rand(4,3), torch.rand(4,5) )
-    tester:assertTableEq(
-        gI:size():totable(), {4, 3},
-        1e-8, "gradInput size mismatch " .. 
-            table.concat(gI:size():totable(), 'x')
-    )
+
+    for i=1,seqLen do
+        tester:assertGeneralEq(
+            pred[i], pred_table[i],
+            1e-8, "step " .. i .. " is different"
+        )
+    end
 end
 
 

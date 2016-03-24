@@ -109,7 +109,9 @@ function Evaluator:_propogate(sampler, state)
 
         if false ~= self:_trigger("before_example", state, example) then
             self:_do_example(example, state)
-            self:_trigger("after_example", state, example)
+            if false == self:_trigger("after_example", state, example) then
+                break
+            end
         end
 
     until sampler:finished()

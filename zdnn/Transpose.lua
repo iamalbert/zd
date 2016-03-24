@@ -1,5 +1,8 @@
 local Transpose, parent = torch.class('zdnn.Transpose', 'nn.Module')
 
+-- copy from the undocumented nn.Transpose
+-- https://raw.githubusercontent.com/torch/nn/6916775db4731b5c40656085471448be476a321d/Transpose.lua
+
 -- transpose dimensions:
 -- n = zdnn.Transpose({1,4},{1,-3})
 -- will transpose dims 1 and 4, then 1 and 3...
