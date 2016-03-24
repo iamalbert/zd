@@ -1,11 +1,16 @@
-local Class, Parent = torch.class('zdnn.Sequencer', 'nn.Sequential')
+local Class, Parent = torch.class('zdnn.BiSequencer', 'nn.Sequential')
 
-function Class:__init( module, nInputDim )
+function Class:__init( module, module_rev, nInputDim )
     Parent.__init(self)
     self.module = module
+    if module_rev then
+        self.module_rev = module_rev
+    else
+        self.module_rev = module:clone():reset()
+    end
 
     self:add( nn.SplitTable(1) )
-        :add( nn.Sequencer(module) )
+        :add( nn.BiSequencer(self.module, self.module_rev) )
         :add( nn.Sequencer(nn.Unsqueeze(1)) )
         :add( nn.JoinTable(1) )
 end
@@ -72,7 +77,19 @@ function Class:accGradParameters(input, gradOutput, scale)
 end
 
 function Class:backward(input, gradOutput, scale)
-    return Parent.backward(self, input, gradOutput, scale)
+    local dim = input:dim()
+    assert( dim == 2 or dim == 3, 
+        " input size must be [Time x Batch x Vector] or [Time x Vector]," ..
+        " given [" .. table.concat(input:size():totable(),'x') .. "]"
+    )
+    
+    if dim == 2 then
+        local i  = input:view(input:size(1), 1, input:size(2) )
+        local go = gradOutput:view(gradOutput:size(1), 1, gradOutput:size(2) )
+        return Parent.backward(self, i, go, scale):resizeAs(input)
+    else
+        return Parent.backward(self, gradOutput, scale)
+    end
 end
 --]]
 

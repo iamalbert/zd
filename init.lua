@@ -35,6 +35,7 @@ local modules = {
     'zdnn/Slice',
     'zdnn/ReplicateAs',
     'zdnn/Sequencer',
+    'zdnn/BiSequencer',
     'zdnn/GeneralLinear',
     'zdnn/Transpose',
 }

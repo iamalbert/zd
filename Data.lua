@@ -12,11 +12,8 @@ do
     end
 
     function Class:cuda(opt)
-        if opt == false  then
-            self._cuda = false
-        else
-            self._cuda = true
-        end
+        self._cuda = not not opt
+        return self
     end
 
     function Class:reset()
