@@ -13,6 +13,9 @@ local seqLen = 956
 local zrec = nn.GRU(inDim, outDim)
 local rrec = zrec:clone()
 
+local _, zgp = zrec:getParameters()
+local _, rgp = rrec:getParameters()
+
 local zm = zdnn.Sequencer(zrec)
 local rm = nn.Sequencer(rrec)
 
@@ -25,6 +28,7 @@ test["Sequencer:backward: 1-batch"] = function()
 
     local target = torch.rand(seqLen, 1, outDim)
     local target_table = split:forward( target )
+
 
     tester:assertGeneralEq( #input_table, input:size(1),
         1e-8, "split length incorrect")
@@ -72,6 +76,9 @@ test["Sequencer:backward: 1-batch"] = function()
             1e-8, "gradInput step " .. i .. " is different"
         )
     end
+
+    tester:assertGeneralEq( zgp, rgp, 1e-8, "gradParam not equal")
+
 end
 test["Sequencer:backward: n-batch"] = function()
 
@@ -82,6 +89,7 @@ test["Sequencer:backward: n-batch"] = function()
 
     local target = torch.rand(seqLen, bs, outDim)
     local target_table = split:forward( target )
+
 
     tester:assertGeneralEq( #input_table, input:size(1),
         1e-8, "split length incorrect")
@@ -130,6 +138,7 @@ test["Sequencer:backward: n-batch"] = function()
             1e-8, "gradInput step " .. i .. " is different"
         )
     end
+    tester:assertGeneralEq( zgp, rgp, 1e-8, "gradParam not equal")
 end
 
 
@@ -199,6 +208,7 @@ test["Sequencer:backward: no-batch"] = function ()
             1e-8, "gradInput step " .. i .. " is different"
         )
     end
+    tester:assertGeneralEq( zgp, rgp, 1e-8, "gradParam not equal")
 end
 
 
