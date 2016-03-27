@@ -15,6 +15,12 @@ do
     Module.__sub__ = function( prev, next )
         return next(prev)
     end
+
+    function Module:forwardbackward(input, gradOutput)
+        local output = self:forward(input)
+        local gradInput = self:backward(input, gradOutput)
+        return output, gradInput
+    end
 end
 
 assert( nngraph, "should require 'nngraph' first")
