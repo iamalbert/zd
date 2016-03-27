@@ -38,6 +38,8 @@ local modules = {
     'zdnn/BiSequencer',
     'zdnn/GeneralLinear',
     'zdnn/Transpose',
+    'zdnn/PairwiseReplicate',
+    'zdnn/SetDiagonal',
 }
 
 for _, file in ipairs( modules ) do
