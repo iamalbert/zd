@@ -12,7 +12,7 @@ function Class:makeMask(input)
     else
         self.mask = self.mask or torch.ByteTensor()
     end
-    return self.mask:eye(input:size(1))
+    return torch.eye(self.mask, input:size(1) )
 end
 
 function Class:updateOutput(input)
