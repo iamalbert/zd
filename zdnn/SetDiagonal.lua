@@ -6,12 +6,17 @@ function Class:__init(value)
     self.value = value
 end
 
-function makeMask(input)
-    return torch.ByteTensor():eye(input:size(1))
+function Class:makeMask(input)
+    if input:type() == 'torch.CudaTensor' then
+        self.mask = self.mask or torch.CudaTensor()
+    else
+        self.mask = self.mask or torch.ByteTensor()
+    end
+    return self.mask:eye(input:size(1))
 end
 
 function Class:updateOutput(input)
-    local mask = makeMask(input)
+    local mask = self:makeMask(input)
 
     self.output = input:clone()
     self.output:maskedFill(mask, self.value)
@@ -21,7 +26,7 @@ end
 
 
 function Class:updateGradInput(input, gradOutput)
-    local mask = makeMask(input)
+    local mask = self:makeMask(input)
     self.gradInput = gradOutput:clone()
     self.gradInput:maskedFill(mask, 0)
     return self.gradInput
