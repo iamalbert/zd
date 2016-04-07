@@ -1,5 +1,4 @@
 require 'nn'
-require 'rnn'
 require 'optim'
 require 'nngraph'
 
@@ -36,6 +35,7 @@ local modules = {
     'zdnn/ReplicateAs',
     'zdnn/Sequencer',
     'zdnn/BiSequencer',
+    'zdnn/Bidirection',
     'zdnn/GeneralLinear',
     'zdnn/Transpose',
     'zdnn/PairwiseReplicate',

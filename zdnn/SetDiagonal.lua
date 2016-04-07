@@ -7,12 +7,12 @@ function Class:__init(value)
 end
 
 function Class:makeMask(input)
+    self.mask = torch.ByteTensor():eye( input:size(1) )
     if input:type() == 'torch.CudaTensor' then
-        self.mask = self.mask or torch.CudaTensor()
+        self.mask = self.mask:cuda()
     else
-        self.mask = self.mask or torch.ByteTensor()
     end
-    return torch.eye(self.mask, input:size(1) )
+    return self.mask
 end
 
 function Class:updateOutput(input)
