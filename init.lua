@@ -40,6 +40,7 @@ local modules = {
     'zdnn/Transpose',
     'zdnn/PairwiseReplicate',
     'zdnn/SetDiagonal',
+    'zdnn/SetUpperTri',
 }
 
 for _, file in ipairs( modules ) do
