@@ -1,5 +1,8 @@
 do
     local Class = torch.class('zd.Sampler')
+    --[[
+
+    --]]
 
     function Class:__init(config)
         assert( config,  "require a config table"  )
@@ -9,6 +12,7 @@ do
         self._config = config
         self._cuda = config.cuda
         self._callback = config.callback
+
     end
 
     function Class:cuda(opt)
@@ -33,7 +37,7 @@ do
     end
 
     function Class:next()
-        local ret = self:current()
+        local ret = self:current(self.state.index)
 
         assert( ret ~= nil, "::current() return value is nil" )
         if self._callback then
@@ -72,6 +76,79 @@ do
         repeat 
             func( self:next() )
         until self:finished()
+    end
+end
+
+do 
+    local Class, Parent = torch.class('zd.SmartIterator', 'zd.Sampler')
+    function Class:__init(config)
+        Parent.__init(self, config)
+    end
+    function Class:rewind()
+        local state, source, config = self.state, self._source, self._config
+
+        local sizes = {}
+        zd.util.recursive_call_tensor( source, function(t)
+            assert( t:dim() > 0, "find a zero-dim tensor in source")
+            table.insert( sizes, t:size(1) )
+        end)
+
+        for i = 2, #sizes do
+            local sz = sizes[i]
+            assert( sz == sizes[1], 
+                "tensor size inconsistent: " .. table.concat(sizes, ','))
+        end
+
+        local max = sizes[1]
+        self.length = max
+
+        if config.shuffle then
+            self.order = torch.randperm(1, max):long()
+        else
+            self.order = torch.range(1, max):long()
+        end
+
+        if self:batchSize() > 0 then
+            local bs = self:batchSize()
+            max = math.ceil(max / bs) 
+        end
+
+        return max
+    end
+    function Class:getBatch(i, yield)
+        local bs = self:batchSize()
+
+        local first = (i-1)*bs + 1 
+        local last  = i * bs
+
+        if last > self.length then
+            last = self.length
+        end
+
+        local idx = self.order:sub( first, last )
+
+        return zd.util.template_until_tensor( self._source, yield, 
+            function(template,new)
+                new:set(template:index(1,idx))
+            end
+        )
+    end
+    function Class:getNoBatch(i, yield)
+        local idx = self.order[i]
+        return zd.util.template_until_tensor( self._source, yield, 
+            function(template,new)
+                new:set(template[i])
+            end
+        )
+    end
+    function Class:current(i)
+        self.yield = self.yield or {}
+        if self:batchSize() > 0 then
+            self.yield = self:getBatch(i, self.yield)
+        else
+            self.yield = self:getNoBatch(i, self.yield)
+        end
+        return self.yield
     end
 end
 

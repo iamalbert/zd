@@ -51,6 +51,81 @@ function test.no_shuffle_batch()
 end
 
 
+function test.smart_iterator()
+    local N, T1, T2, D = 100, 30, 10, 20
+    local C = 11
+
+    local seq1 = torch.rand(N,T1,D)
+    local seq2 = torch.rand(N,T2,D)
+
+    local target = torch.LongTensor(N, C)
+
+    local iter = zd.SmartIterator {
+        source = {
+            input = { seq1, seq2 },
+            target = target
+        },
+    }
+
+    iter:reset()
+    for i = 1, N do
+        local yield = iter:next()
+
+        local sample = {
+            input = { seq1[i], seq2[i] },
+            target = target[i]
+        }
+        tester:assertGeneralEq( sample.target, yield.target )
+        tester:assertGeneralEq( sample.input[1], yield.input[1] )
+        tester:assertGeneralEq( sample.input[2], yield.input[2] )
+    end
+end
+
+function test.smart_iterator_batch()
+    local N, T1, T2, D = 100, 30, 10, 20
+    local C = 11
+
+    local seq1 = torch.rand(N,T1,D)
+    local seq2 = torch.rand(N,T2,D)
+
+    local target = torch.LongTensor(N, C)
+
+    local batch = 30
+    local iter = zd.SmartIterator {
+        source = {
+            input = { seq1, seq2 },
+            target = target
+        },
+        batch = batch
+    }
+
+    iter:reset()
+    for i = 1, math.floor(N/batch)*batch, batch do
+        local idx3 = {{i,i+batch-1}, {}, {}}
+        local idx2 = {{i,i+batch-1}, {}}
+        local yield = iter:next()
+
+        local sample = {
+            input = { seq1[idx3], seq2[idx3] },
+            target = target[idx2]
+        }
+        tester:assertGeneralEq( sample.target, yield.target )
+        tester:assertGeneralEq( sample.input[1], yield.input[1] )
+        tester:assertGeneralEq( sample.input[2], yield.input[2] )
+    end
+    do 
+        local yield = iter:next()
+        local idx3 = {{91,100}, {}, {}}
+        local idx2 = {{91,100}, {}}
+        local sample = {
+            input = { seq1[idx3], seq2[idx3] },
+            target = target[idx2]
+        }
+        tester:assertGeneralEq( sample.target, yield.target )
+        tester:assertGeneralEq( sample.input[1], yield.input[1] )
+        tester:assertGeneralEq( sample.input[2], yield.input[2] )
+    end
+end
 -- add more tests by adding to the 'test' table
 
 return tester:add(test):run()

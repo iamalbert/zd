@@ -1,3 +1,4 @@
+local tds = require 'tds'
 local escapepatter = {
     ['\n'] = '\\n',
     ['\t'] = '\\t',
@@ -117,6 +118,7 @@ function table.transpose ( tbl )
     end
     return ret
 end
+ 
 
 local util = torch.class('zd.util')
 
@@ -130,6 +132,36 @@ local util_impl = {
     isString   = function(obj) return type(obj) == "string"   end,
     isFunction = function(obj) return type(obj) == "function" end,
     isTensor   = torch.isTensor,
+    isArray    = function (t)
+      local i = 0
+      for _ in pairs(t) do
+          i = i + 1
+          if t[i] == nil then return false end
+      end
+      return i
+    end,
+    isArrayLike = function(obj)
+        if torch.isTensor(obj) then
+            if obj:nElement() > 0 then
+                return obj:size(1)
+            else
+                return false
+            end
+        elseif torch.type(obj) == "tds.Vec" then
+            if #obj > 0 then
+                return #obj
+            else
+                return false
+            end
+        else
+            local s = zd.util.isArray(obj)
+            if s ~= false and s > 0 then
+                return s
+            else
+                return false
+            end
+        end
+    end,
 
     make_immutable = function (tbl)  
       return setmetatable({}, {  
@@ -163,6 +195,66 @@ local util_impl = {
         end
     end,
 
+    recursive_call_tensor = function(obj, func)
+        if zd.util.isTensor(obj) then
+            func(obj)
+        else
+            for k,v in pairs(obj) do
+                zd.util.recursive_call_tensor(v, func)
+            end
+        end
+    end,
+
+    template_until_tensor = function(obj, new, f)
+        if torch.isTensor(obj) then  
+            new = new or obj.new()
+            f(obj, new)
+            return new
+        else -- is an table
+            new = new or {}
+            for k,v in pairs(obj) do
+                new[k] = zd.util.template_until_tensor(v, new[k], f)
+            end
+            return new
+        end
+    end,
+
+    template_take_array = function(obj, idx, new )
+        assert(idx ~= nil, "idx shall not be nil")
+        return zd.util.template_until_array(obj, new, function(o,n)
+            n[idx] = o[idx]
+        end)
+    end,
+
+    cloneType = function(obj)
+        if zd.util.isTensor(obj) then
+            return obj.new()
+        elseif torch.type(obj) == 'tds.Vec' then
+            return tds.Vec()
+        elseif torch.type(obj) == 'tds.Hash' then
+            return tds.Hash()
+        else
+            return {}
+        end
+    end,
+
+
+
+    template_until_array = function(obj, new, f)
+        local sz = zd.util.isArrayLike(obj)
+        new = new or zd.util.cloneType(obj)
+        if sz == false then  -- is an hash-table
+            for k,v in pairs(obj) do
+                new[k] = new[k] or {}
+                zd.util.template_until_array(v, new[k], f)
+            end
+        else -- is an array
+            f(obj, new)
+        end
+        -- print(obj, new)
+        return new
+    end,
+
     recursive_cuda = function(obj)
         return zd.util.recursive_find_tensor(obj, function(o)
             return o:cuda()
@@ -184,3 +276,4 @@ local util_impl = {
 for name, func in pairs(util_impl) do
     util[name] = func
 end
+
