@@ -17,6 +17,7 @@ local modules = {
     'optims/rmsprop',
     'optims/adagrad',
 
+    'Source',
     'Data',
     'Evaluator',
     'Trainer',

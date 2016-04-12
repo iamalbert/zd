@@ -13,7 +13,6 @@ do
         self._config = config
         self._cuda = config.cuda
         self._callback = config.callback
-
     end
 
     function Class:cuda(opt)

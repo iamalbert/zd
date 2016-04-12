@@ -140,6 +140,22 @@ local util_impl = {
       end
       return i
     end,
+    isArrayOfTensors = function (t)
+        if torch.isTensor(t) and t:dim() > 0 then 
+          return t:size(1)
+        else
+          local i = 0
+          for _ in pairs(t) do
+            i = i + 1
+            if not torch.isTensor(t[i]) then 
+              return false 
+            end
+          end
+          return i
+        end
+        return false
+    end,
+
     isArrayLike = function(obj)
         if torch.isTensor(obj) then
             if obj:nElement() > 0 then

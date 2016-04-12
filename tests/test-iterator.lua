@@ -93,8 +93,8 @@ function test.smart_iterator_batch()
     local batch = 30
     local iter = zd.SmartIterator {
         template = {
-            input = { seq1, seq2 },
-            target = target
+            input = { zd.Source(seq1), zd.Source(seq2) },
+            target = zd.Source(target)
         },
         batch = batch
     }
