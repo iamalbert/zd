@@ -61,7 +61,7 @@ function test.smart_iterator()
     local target = torch.LongTensor(N, C)
 
     local iter = zd.SmartIterator {
-        source = {
+        template = {
             input = { seq1, seq2 },
             target = target
         },
@@ -92,7 +92,7 @@ function test.smart_iterator_batch()
 
     local batch = 30
     local iter = zd.SmartIterator {
-        source = {
+        template = {
             input = { seq1, seq2 },
             target = target
         },

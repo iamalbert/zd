@@ -6,9 +6,10 @@ do
 
     function Class:__init(config)
         assert( config,  "require a config table"  )
-        assert( config and zd.util.isTable(config.source), 
-            "field `source' is required"  )
-        self._source = config.source
+        config.template = config.template or config.source
+        assert( config and zd.util.isTable(config.template), 
+            "field `template' (or `template') is required"  )
+        self._template = config.template
         self._config = config
         self._cuda = config.cuda
         self._callback = config.callback
@@ -85,11 +86,11 @@ do
         Parent.__init(self, config)
     end
     function Class:rewind()
-        local state, source, config = self.state, self._source, self._config
+        local state, template, config = self.state, self._template, self._config
 
         local sizes = {}
-        zd.util.recursive_call_tensor( source, function(t)
-            assert( t:dim() > 0, "find a zero-dim tensor in source")
+        zd.util.recursive_call_tensor( template, function(t)
+            assert( t:dim() > 0, "find a zero-dim tensor in template")
             table.insert( sizes, t:size(1) )
         end)
 
@@ -127,7 +128,7 @@ do
 
         local idx = self.order:sub( first, last )
 
-        return zd.util.template_until_tensor( self._source, yield, 
+        return zd.util.template_until_tensor( self._template, yield, 
             function(template,new)
                 new:set(template:index(1,idx))
             end
@@ -135,7 +136,7 @@ do
     end
     function Class:getNoBatch(i, yield)
         local idx = self.order[i]
-        return zd.util.template_until_tensor( self._source, yield, 
+        return zd.util.template_until_tensor( self._template, yield, 
             function(template,new)
                 new:set(template[i])
             end
@@ -156,18 +157,18 @@ do
     local Class, parent = torch.class('zd.Iterator', 'zd.Sampler')
 
     function Class:rewind()
-        local source = self._source
+        local template = self._template
         local config = self._config
         
         local state = self.state
         state.max = nil 
 
-        for name, db in pairs(source) do
+        for name, db in pairs(template) do
             if state.max == nil then
                 state.max = zd.util.get_size( db )
             else
                 if zd.util.get_size(db) ~= state.max then
-                    error("inconsitent length of data sources")
+                    error("inconsitent length of data templates")
                 end
             end
         end
@@ -203,7 +204,7 @@ do
     end
 
     function Class:current()
-        local state, source =  self.state, self._source
+        local state, template =  self.state, self._template
         local cur = state.order[ state.index ]
 
         if state.index == state.max and state._pad_length ~= nil then
@@ -211,7 +212,7 @@ do
         end
 
         local ret = {}
-        for name, data in pairs(source) do
+        for name, data in pairs(template) do
             local datum
             if zd.util.isTensor(data) then
                 if self:batchSize() > 0 then
