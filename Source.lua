@@ -64,6 +64,9 @@ do
 end
 do
     local Class, Parent = torch.class('zd.MaskSource', 'zd.Source')
+    function Class:get(i)
+        return self.obj[i]:byte():fill(1)
+    end
     function Class:getBatchReturn(size)
         print("called", size)
         return torch.ByteTensor():zeros(size)
