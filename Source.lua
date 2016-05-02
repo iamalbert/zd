@@ -20,7 +20,22 @@ do
         assert( self._size > 0, "must have at least 1 tensor ")
 
         self.pad_value = pad_value or 0
+
     end
+
+
+    local function template( obj, new, func )
+        if torch.isTypeOf(obj, Class) then  
+            return f(obj, new)
+        else -- is an table
+            new = new or {}
+            for k,v in pairs(obj) do
+                new[k] = template(v, new[k], func)
+            end
+            return new
+        end
+    end
+    Class.template = template
 
     function Class:size()
         return self._size
