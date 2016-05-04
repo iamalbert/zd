@@ -39,6 +39,8 @@ local modules = {
     'zdnn/PairwiseReplicate',
     'zdnn/SetDiagonal',
     'zdnn/SetUpperTri',
+
+    'zdnn/BatchCriterion'
 }
 
 for _, file in ipairs( modules ) do
